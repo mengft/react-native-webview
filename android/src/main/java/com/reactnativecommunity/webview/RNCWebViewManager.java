@@ -13,8 +13,7 @@ import android.Manifest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -396,7 +395,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setMessagingEnabled(WebView view, boolean enabled) {
     ((RNCWebView) view).setMessagingEnabled(enabled);
   }
-   
+
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
     // Remove all previous cookies
@@ -646,7 +645,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         public Bitmap getDefaultVideoPoster() {
           return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
         }
-        
+
         @Override
         public void onShowCustomView(View view, CustomViewCallback callback) {
           if (mVideoView != null) {
@@ -754,6 +753,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         }
       }
 
+      // 微信支付调起客户端授权
+      if (url.startsWith("weixin://wap/pay?")) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        view.getContext().startActivity(intent);
+        return true;
+      }
+
       activeUrl = url;
       dispatchEvent(
         view,
@@ -793,7 +801,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
         new TopLoadingErrorEvent(webView.getId(), eventData));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceivedHttpError(
       WebView webView,
@@ -842,7 +849,6 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
       LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER);
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     protected static final int FULLSCREEN_SYSTEM_UI_VISIBILITY = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
       View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
       View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
@@ -913,8 +919,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       final String url = webView.getUrl();
       if (
         url != null
-        && activeUrl != null
-        && !url.equals(activeUrl)
+          && activeUrl != null
+          && !url.equals(activeUrl)
       ) {
         return;
       }
@@ -1131,16 +1137,16 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
       if (mOnScrollDispatchHelper.onScrollChanged(x, y)) {
         ScrollEvent event = ScrollEvent.obtain(
-                this.getId(),
-                ScrollEventType.SCROLL,
-                x,
-                y,
-                mOnScrollDispatchHelper.getXFlingVelocity(),
-                mOnScrollDispatchHelper.getYFlingVelocity(),
-                this.computeHorizontalScrollRange(),
-                this.computeVerticalScrollRange(),
-                this.getWidth(),
-                this.getHeight());
+          this.getId(),
+          ScrollEventType.SCROLL,
+          x,
+          y,
+          mOnScrollDispatchHelper.getXFlingVelocity(),
+          mOnScrollDispatchHelper.getYFlingVelocity(),
+          this.computeHorizontalScrollRange(),
+          this.computeVerticalScrollRange(),
+          this.getWidth(),
+          this.getHeight());
 
         dispatchEvent(this, event);
       }
