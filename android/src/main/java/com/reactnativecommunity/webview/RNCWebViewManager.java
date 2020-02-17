@@ -742,6 +742,18 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+      Map<String, String> extraHeaders = new HashMap<>();
+      // 微信支付URL授权
+      if (url.startsWith("https://wx.tenpay.com")) {
+        // 微信支付授权域名
+        if (view.getOriginalUrl().startsWith("http://www.shandw.com")) {
+          extraHeaders.put("Referer", "http://www.shandw.com");
+          view.loadUrl(url, extraHeaders);
+          return true;
+        }
+      }
+
       activeUrl = url;
       dispatchEvent(
         view,
