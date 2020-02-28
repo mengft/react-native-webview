@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,6 +115,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public static final int COMMAND_INJECT_JAVASCRIPT = 6;
   public static final int COMMAND_LOAD_URL = 7;
   public static final int COMMAND_FOCUS = 8;
+
+  public static String activePayUrl = "";
 
   // android commands
   public static final int COMMAND_CLEAR_FORM_DATA = 1000;
@@ -746,11 +749,17 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       // 微信支付URL授权
       if (url.startsWith("https://wx.tenpay.com")) {
         // 微信支付授权域名
-        if (view.getOriginalUrl().startsWith("http://www.shandw.com")) {
-          extraHeaders.put("Referer", "http://www.shandw.com");
-          view.loadUrl(url, extraHeaders);
-          return true;
+        String referer = "http://api.ehw8.com";
+        if (view.getOriginalUrl().startsWith("https://dyz.basicgame.cn")) {
+          if (activePayUrl.equals(url)) return false;
+          activePayUrl = url;
+          referer = "https://dyz.basicgame.cn/";
+        } else if (view.getOriginalUrl().startsWith("http://www.shandw.com")) {
+          referer = "http://www.shandw.com";
         }
+        extraHeaders.put("Referer", referer);
+        view.loadUrl(url, extraHeaders);
+        return true;
       }
 
       // 微信支付调起客户端授权
